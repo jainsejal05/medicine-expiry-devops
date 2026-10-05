@@ -1,0 +1,62 @@
+name: CI/CD - Build, Test, Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # ===== CI: Build + Test =====
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        working-directory: ./backend
+        run: python -m pytest test_app.py -v
+
+      - name: Security scan (dependency vulnerabilities)
+        working-directory: ./backend
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt || true
+
+      - name: Build backend Docker image
+        run: docker build -t medicine-expiry-backend ./backend
+
+      - name: Confirm image built successfully
+        run: docker images | grep medicine-expiry-backend
+
+  # ===== CD: Deploy to EC2 (only runs on push to main, after build-and-test passes) =====
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/medicine-expiry-devops
+            git pull origin main
+            docker compose up -d --build
+            docker ps

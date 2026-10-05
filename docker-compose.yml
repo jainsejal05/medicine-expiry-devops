@@ -1,0 +1,64 @@
+services:
+
+  # ===== MySQL Database Container =====
+  mysql:
+    image: mysql:8.0
+    container_name: medicine_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: medicine_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - medicine_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===== Flask Backend Container =====
+  backend:
+    build: ./backend
+    container_name: medicine_backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: mysql          # service name above - Docker's internal DNS resolves this
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: medicine_db
+      DB_PORT: 3306
+      SECRET_KEY: ${SECRET_KEY}
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - medicine_network
+
+  # ===== Frontend Container (nginx serving static files) =====
+  # Serves the frontend on the SAME host as the backend (port 80), so browsers treat
+  # login cookies as same-site (only host matters for SameSite, not port) - fixes
+  # cross-site cookie blocking that happens when frontend and backend are on different hosts.
+  frontend:
+    image: nginx:alpine
+    container_name: medicine_frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+    networks:
+      - medicine_network
+
+networks:
+  medicine_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

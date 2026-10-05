@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Category Medicines - Medicine Expiry Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav>
+        <h1>💊 Medicine Expiry Tracker</h1>
+        <div class="nav-links">
+            <button id="backBtn" class="back-btn">← Back</button>
+            <div class="nav-user">
+                <span class="nav-username">👤 <strong id="navUsername">...</strong></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h2 id="pageTitle">Category</h2>
+            <div style="display:flex; gap:12px;">
+                <input type="text" id="searchBox" class="search-input" placeholder="🔍 Search by name...">
+                <button class="btn" onclick="openAddForm()">+ Add Medicine</button>
+            </div>
+        </div>
+
+        <div id="banner" class="banner banner-error"></div>
+
+        <div class="filter-pills" id="statusFilterPills">
+            <div class="filter-pill active" data-status="">All</div>
+            <div class="filter-pill" data-status="Safe">Safe</div>
+            <div class="filter-pill" data-status="Expiring Soon">Expiring Soon</div>
+            <div class="filter-pill" data-status="Urgent">Urgent</div>
+            <div class="filter-pill" data-status="Expired">Expired</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Batch No</th>
+                        <th>Quantity</th>
+                        <th>Mfg Date</th>
+                        <th>Expiry Date</th>
+                        <th>Supplier</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="medicineTableBody">
+                    <tr><td colspan="8" class="empty-state">Loading medicines...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== Add/Edit Modal Form ===== -->
+    <div id="formOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="formTitle">Add Medicine</h3>
+            <form id="medicineForm">
+                <input type="hidden" id="medId">
+                <input type="hidden" id="medCategory" required>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <div class="category-picker" id="categoryPicker"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Medicine Name</label>
+                    <input type="text" id="medName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Batch Number</label>
+                    <input type="text" id="medBatch" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="medQuantity" required min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Manufacturing Date</label>
+                    <input type="date" id="medMfgDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Expiry Date</label>
+                    <input type="date" id="medExpiryDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Supplier</label>
+                    <input type="text" id="medSupplier">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeForm()">Cancel</button>
+                    <button type="submit" class="btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script src="category-medicines.js"></script>
+</body>
+</html>

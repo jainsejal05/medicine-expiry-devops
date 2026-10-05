@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medicines - Medicine Expiry Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav>
+        <h1>💊 Medicine Expiry Tracker</h1>
+        <div class="nav-links">
+            <button id="backBtn" class="back-btn">← Back</button>
+            <div class="nav-user">
+                <span class="nav-username">👤 <strong id="navUsername">...</strong></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h2 id="pageTitle">Medicines</h2>
+        </div>
+
+        <div id="banner" class="banner banner-error"></div>
+
+        <div id="sectionsWrap"></div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script src="status-medicines.js"></script>
+</body>
+</html>

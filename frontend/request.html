@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Stock - Medicine Expiry Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav>
+        <h1>💊 Medicine Expiry Tracker</h1>
+        <div class="nav-links">
+            <button id="backBtn" class="back-btn">← Back</button>
+            <div class="nav-user">
+                <span class="nav-username">👤 <strong id="navUsername">...</strong></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>Request Stock</h2>
+        </div>
+
+        <div id="banner" class="banner banner-error"></div>
+
+        <div class="section-title">1. Select City</div>
+        <div id="cityGrid" class="city-grid"></div>
+
+        <div id="pharmacistSection" style="display:none;">
+            <div class="section-title">2. Select Pharmacist</div>
+            <div class="table-wrapper" style="margin-bottom:24px;">
+                <table>
+                    <thead>
+                        <tr><th>Pharmacist ID</th><th>Name</th><th>City</th><th></th></tr>
+                    </thead>
+                    <tbody id="pharmacistTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== Send Request Modal ===== -->
+        <div id="formOverlay" class="modal-overlay">
+            <div class="modal-box">
+                <h3>Send Stock Request</h3>
+                <p style="font-size:13px; color:#64748b; margin-bottom:16px;">To: <strong id="targetPharmacistLabel"></strong></p>
+                <form id="requestForm">
+                    <input type="hidden" id="targetPharmacistId">
+                    <div class="form-group">
+                        <label>Medicine Name</label>
+                        <input type="text" id="reqMedicineName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity Needed</label>
+                        <input type="number" id="reqQuantity" required min="1">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-cancel" onclick="closeRequestForm()">Cancel</button>
+                        <button type="submit" class="btn">Send Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="section-title">Requests Sent by You</div>
+        <div id="sentRequestsWrap"></div>
+
+        <div class="section-title">Requests Received</div>
+        <div id="receivedRequestsWrap"></div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script src="request.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medicine Expiry Tracker - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav>
+        <h1>💊 Medicine Expiry Tracker</h1>
+        <div class="nav-links">
+            <a href="index.html" class="active">Dashboard</a>
+            <div class="nav-user">
+                <span class="nav-username">👤 <strong id="navUsername">...</strong></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>Dashboard</h2>
+        </div>
+
+        <div id="banner" class="banner banner-error"></div>
+
+        <div id="pharmacistIdWrap"></div>
+
+        <div id="pendingAlert" class="pending-alert" style="display:none;">
+            <span id="pendingAlertText"></span>
+            <a href="admin-approvals.html" class="btn btn-sm" style="background:#92400e;">Review Requests</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card stat-total">
+                <h3>Total Medicines</h3>
+                <p id="totalMedicines">–</p>
+            </div>
+            <div class="stat-card stat-total">
+                <h3>Total Quantity</h3>
+                <p id="totalQuantity">–</p>
+            </div>
+            <div class="stat-card stat-safe clickable" onclick="goToStatus('Safe')">
+                <h3>Safe</h3>
+                <p id="safeCount">–</p>
+            </div>
+            <div class="stat-card stat-soon clickable" onclick="goToStatus('Expiring Soon')">
+                <h3>Expiring Soon</h3>
+                <p id="soonCount">–</p>
+            </div>
+            <div class="stat-card stat-urgent clickable" onclick="goToStatus('Urgent')">
+                <h3>Urgent</h3>
+                <p id="urgentCount">–</p>
+            </div>
+            <div class="stat-card stat-expired clickable" onclick="goToStatus('Expired')">
+                <h3>Expired</h3>
+                <p id="expiredCount">–</p>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <div class="action-card" onclick="window.location.href='report.html'">
+                <div class="action-icon">📊</div>
+                <div class="action-label">Report</div>
+                <div class="action-desc">Charts & PDF export</div>
+            </div>
+            <div class="action-card" id="requestActionCard" onclick="window.location.href='request.html'">
+                <div class="action-icon">🔄</div>
+                <div class="action-label" id="requestActionLabel">Request</div>
+                <div class="action-desc" id="requestActionDesc">Request stock from others</div>
+            </div>
+            <div class="action-card" id="viewMedicinesCard" onclick="window.location.href='view-medicines.html'">
+                <div class="action-icon">📦</div>
+                <div class="action-label">View Medicines</div>
+                <div class="action-desc">Browse by category</div>
+            </div>
+            <div class="action-card" id="stockByUserCard" style="display:none;" onclick="window.location.href='admin-stock-by-user.html'">
+                <div class="action-icon">👥</div>
+                <div class="action-label">Stock by User</div>
+                <div class="action-desc">View each pharmacist's inventory</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
