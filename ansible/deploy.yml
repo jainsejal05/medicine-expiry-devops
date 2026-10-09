@@ -1,0 +1,53 @@
+---
+# Lightweight deploy playbook - used by Jenkins on every build.
+# (playbook.yml is the one-time server SETUP: installs Docker etc.
+#  deploy.yml is the repeatable DEPLOY: pull latest code + restart containers.)
+- name: Deploy latest code to EC2
+  hosts: medicine_server
+  become: false
+
+  vars:
+    project_dir: /home/ubuntu/medicine-expiry-devops
+    repo_url: https://github.com/jainsejal05/medicine-expiry-devops.git
+
+  tasks:
+
+    - name: Pull latest code from GitHub
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_dir }}"
+        version: main
+        force: yes
+
+    - name: Check that the .env file exists on the server
+      stat:
+        path: "{{ project_dir }}/.env"
+      register: env_file
+
+    - name: Stop with a clear message if .env is missing
+      fail:
+        msg: "{{ project_dir }}/.env is missing on the server. Create it with DB_PASSWORD=... before deploying."
+      when: not env_file.stat.exists
+
+    - name: Rebuild and restart containers
+      command: docker compose up -d --build
+      args:
+        chdir: "{{ project_dir }}"
+
+    - name: Wait until the backend health endpoint answers
+      uri:
+        url: http://127.0.0.1:5000/api/health
+        status_code: 200
+      register: health
+      retries: 10
+      delay: 6
+      until: health.status == 200
+
+    - name: List running containers
+      command: docker ps --format "{% raw %}{{.Names}} - {{.Status}}{% endraw %}"
+      register: container_list
+      changed_when: false
+
+    - name: Show running containers
+      debug:
+        var: container_list.stdout_lines
