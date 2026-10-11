@@ -1,0 +1,27 @@
+# Prometheus configuration - tells Prometheus WHAT to scrape and HOW OFTEN.
+global:
+  scrape_interval: 15s       # collect metrics every 15 seconds
+  evaluation_interval: 15s   # evaluate alert rules every 15 seconds (used in the next step)
+
+scrape_configs:
+
+  # 1) Our Flask backend (application metrics: requests, latency, errors)
+  - job_name: backend
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend:5000"]     # "backend" = docker-compose service name
+
+  # 2) The server itself (CPU, memory, disk) - SATURATION signal
+  - job_name: node
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # 3) Every container (CPU / memory per container)
+  - job_name: cadvisor
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  # 4) Prometheus monitoring itself
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

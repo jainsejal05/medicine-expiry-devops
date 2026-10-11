@@ -52,6 +52,12 @@ class TestCalculateStatus:
         future_date = date.today() + timedelta(days=100)
         assert calculate_status(future_date) == "Safe"
 
-
+class TestMetrics:
+    def test_metrics_endpoint_is_exposed(self):
+        from app import app
+        resp = app.test_client().get("/metrics")
+        assert resp.status_code == 200
+        assert b"medicine_app_info" in resp.data
+        
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

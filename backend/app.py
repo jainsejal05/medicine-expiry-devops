@@ -6,11 +6,13 @@ from functools import wraps
 import os
 import secrets
 from db import get_connection
+from observability import setup_observability
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
 CORS(app)
+setup_observability(app)
 
 # ===== In-memory token store: { token: {"user_id", "username", "role", "status", "pharmacist_id"} } =====
 active_tokens = {}
@@ -196,11 +198,15 @@ def me():
 # ===== HEALTH CHECK =====
 # =========================================================
 
+
 @app.route("/api/health", methods=["GET"])
 def health_check():
-    return jsonify({"status": "ok", "message": "Backend is running version 2"}), 200
-
-
+    try:
+        conn = get_connection()
+        conn.close()
+        return jsonify({"status": "ok", "database": "up"}), 200
+    except Exception:
+        return jsonify({"status": "degraded", "database": "down"}), 503
 # =========================================================
 # ===== ADMIN: APPROVE / REJECT PHARMACISTS =====
 # =========================================================
@@ -664,4 +670,4 @@ def respond_request(req_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

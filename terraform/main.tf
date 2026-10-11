@@ -62,6 +62,21 @@ resource "aws_security_group" "medicine_sg" {
     Name = "medicine-expiry-sg"
   }
 }
+  ingress {
+    description = "Grafana"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Prometheus"
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 # ===== Get the latest Ubuntu 22.04 AMI automatically (so we don't hardcode an ID that expires) =====
 data "aws_ami" "ubuntu" {
