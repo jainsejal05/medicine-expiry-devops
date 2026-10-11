@@ -1,0 +1,63 @@
+# Alert rules for Medicine Expiry Tracker.
+# Each rule is tied to an SLO written in docs/SLO.md.
+groups:
+  - name: medicine-tracker-slo-alerts
+    rules:
+
+      # AVAILABILITY: is the backend reachable at all?
+      - alert: BackendDown
+        expr: up{job="backend"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend is DOWN"
+          description: "Prometheus cannot scrape the Flask backend for more than 30 seconds. Users cannot use the app."
+
+      # ERRORS: more than 1% of requests failing with 5xx (SLO allows only 0.5%)
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(flask_http_request_total{status=~"5.."}[2m]))
+            / sum(rate(flask_http_request_total[2m])) > 0.01
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 1% of requests are failing (5xx)"
+          description: "Error ratio is above 1% for 2 minutes. The error budget is being consumed faster than planned."
+
+      # ERROR BUDGET FAST BURN: burn rate 14.4x = 2% of the 30-day budget used in 1 hour
+      - alert: ErrorBudgetFastBurn
+        expr: |
+          sum(rate(flask_http_request_total{status=~"5.."}[5m]))
+            / sum(rate(flask_http_request_total[5m])) > (14.4 * 0.005)
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error budget is burning 14x too fast"
+          description: "At this rate the whole monthly error budget (99.5% SLO) will be gone in about 2 days. Page the on-call engineer."
+
+      # LATENCY: p95 above the 500 ms SLO
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(flask_http_request_duration_seconds_bucket[5m])) by (le)) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 latency is above 500 ms"
+          description: "95th percentile response time has been above the 0.5s SLO for 2 minutes."
+
+      # SATURATION: server disk almost full (this actually happened during our deployment!)
+      - alert: DiskAlmostFull
+        expr: |
+          100 - (node_filesystem_avail_bytes{mountpoint="/rootfs",fstype!="tmpfs"}
+            / node_filesystem_size_bytes{mountpoint="/rootfs",fstype!="tmpfs"} * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Server disk is more than 85% full"
+          description: "Clean Docker images/build cache or enlarge the volume before deployments start failing."

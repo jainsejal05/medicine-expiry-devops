@@ -1,7 +1,17 @@
 # Prometheus configuration - tells Prometheus WHAT to scrape and HOW OFTEN.
 global:
   scrape_interval: 15s       # collect metrics every 15 seconds
-  evaluation_interval: 15s   # evaluate alert rules every 15 seconds (used in the next step)
+  evaluation_interval: 15s   # evaluate alert rules every 15 seconds
+
+# Alert rules are in a separate file
+rule_files:
+  - /etc/prometheus/alert_rules.yml
+
+# When a rule fires, Prometheus sends it to Alertmanager
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
 
 scrape_configs:
 
@@ -9,7 +19,7 @@ scrape_configs:
   - job_name: backend
     metrics_path: /metrics
     static_configs:
-      - targets: ["backend:5000"]     # "backend" = docker-compose service name
+      - targets: ["backend:5000"]
 
   # 2) The server itself (CPU, memory, disk) - SATURATION signal
   - job_name: node

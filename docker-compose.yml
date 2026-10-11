@@ -70,9 +70,22 @@ services:
       - --storage.tsdb.retention.time=7d
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
       - prometheus_data:/prometheus
     ports:
       - "9090:9090"
+    networks:
+      - medicine_network
+
+  # Alertmanager: receives alerts from Prometheus, groups them and routes them
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: medicine_alertmanager
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "9093:9093"
     networks:
       - medicine_network
 

@@ -1,0 +1,12 @@
+# Alertmanager: groups, de-duplicates and routes alerts.
+# For this project alerts are visible in the Alertmanager UI (port 9093).
+# To send real notifications, add an email_configs / slack_configs / webhook_configs block under the receiver.
+route:
+  receiver: default
+  group_by: [alertname]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 1h
+
+receivers:
+  - name: default
