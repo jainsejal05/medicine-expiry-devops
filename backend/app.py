@@ -198,7 +198,7 @@ def me():
 
 @app.route("/api/health", methods=["GET"])
 def health_check():
-    return jsonify({"status": "ok", "message": "Backend is running"}), 200
+    return jsonify({"status": "ok", "message": "Backend is running version 2"}), 200
 
 
 # =========================================================
